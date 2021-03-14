@@ -23,7 +23,7 @@ cd 				"S:\Head_or_Heart\max\post-trial-extension"
 qui do 				"S:\Head_or_Heart\max\post-trial-extension\2-do\00-global.do"
 timer      	 		clear
 timer       			on 1
-use 				"S:\Head_or_Heart\max\archive\1-data\populationforfft_deidentified 2.dta", clear
+use 				"${datadir}\populationforfft_deidentified 2.dta", clear
 drop				fup_* fupb*
 foreach 			var of varlist fup*{
 replace				`var' =. if `var'==0
@@ -53,14 +53,14 @@ replace				nolink=1 if _merge==1
 generate			linked=1 if _merge==3
 replace				linked=0 if linked==.			
 drop				_merge
-merge 1:1 			studyid1 using	"S:\Head_or_Heart\max\archive\1-data\populationforfft_deidentified 2.dta", keepusing(fup* add*) 
+merge 1:1 			studyid1 using	"${datadir}\populationforfft_deidentified 2.dta", keepusing(fup* add*) 
 drop				_merge
 * save this dataset for the trajectory analysis:
 ****************************************************************************************************************************************************************
 keep				studyid1 W *score* matchprob* *match* *first* *id* exp* pupilref linked group* sex bwt iq bayley bwt trial fup_tot centre smokdur matage matedu W gestage multiple agreementpattern iq_score gcse*score ks2_* passac5 year_* bayley_MDI bayley_PDI sen_ever apgar5m byr bmth check died age_* d_randomisation  later_iq_score byr
 compress
 descr, 				full	
-save				"S:\Head_or_Heart\max\post-trial-extension\1-data\trajectory.dta", replace
+save				"${datadir}\trajectory.dta", replace
 * this also added an IQ score to a record of a child who participated in 2 trials one of which is iron (which didn't measure IQ within the trial) mark this iq score as missing (otherwise I get problems with the imputation)
 replace				iq_score=-99 if !inlist(trial,3,4,5,6)
 replace 			later_iq_score=-99 if !inlist(trial,5,6)
@@ -77,7 +77,7 @@ replace teen    		=. if matage ==.
 ****************************************************************************************************************************************************************
 compress
 descr, 				full
-save				"S:\Head_or_Heart\max\post-trial-extension\1-data\samplingframe.dta", replace
+save				"${datadir}\samplingframe.dta", replace
 * keep those who did not link/ were implausible as they have no school outcomes (either never or purpusefully excluded from school link dofile) and their outcomes will be imputed and used in main analysis
 drop				if trial==1 | trial==2
 replace				died =0 if died !=1
@@ -110,9 +110,9 @@ pmm= predictive mean matching using 8 nearest neighbours (knn(8)) */
 ****************************************************************************************************************************************************************			
 * drop observations that were only needed for the imputation: 
 ****************************************************************************************************************************************************************	
-save				"S:\Head_or_Heart\max\post-trial-extension\1-data\mi_fresh.dta", replace
+save				"${datadir}\mi_fresh.dta", replace
 mi 				describe
-use				"S:\Head_or_Heart\max\post-trial-extension\1-data\mi_fresh.dta", clear
+use				"${datadir}\mi_fresh.dta", clear
 mi 				describe
 mi convert			wide
 mi 				describe
@@ -200,7 +200,7 @@ tabstat				z_2ndiq_t`l' if trial == `l', s(mean sd) by(group) format(%5.2f)
 *==============================================================================================================================================================		
 compress
 descr, 			   	full	
-save			    	"S:\Head_or_Heart\max\post-trial-extension\1-data\mi_mainoutcomes2.dta", replace
+save			    	"${datadir}\mi_mainoutcomes2.dta", replace
 *==============================================================================================================================================================
 timer				off 1
 timer 				list 1
