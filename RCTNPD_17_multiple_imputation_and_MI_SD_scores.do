@@ -1,5 +1,8 @@
+clear
 capture 			log close
-log 				using  "S:\Head_or_Heart\max\post-trial-extension\4-logs\mi_edu_outcomes2$S_DATE.log", replace
+cd 				"S:\Head_or_Heart\max\post-trial-extension"
+qui do 				"S:\Head_or_Heart\max\post-trial-extension\2-do\00-global.do"
+log 				using  "${logdir}\mi_edu_outcomes2$S_DATE.log", replace
 *============================================================================================================================================================
 *For:				PhD Thesis - Chapter 7 and 8
 *Purpose: 			- Creates analysis dataset (samplingframe)		
@@ -18,9 +21,6 @@ log 				using  "S:\Head_or_Heart\max\post-trial-extension\4-logs\mi_edu_outcomes
 *				05/03/2021 - make more readable
 *author: 			maximiliane verfuerden
 *============================================================================================================================================================
-clear
-cd 				"S:\Head_or_Heart\max\post-trial-extension"
-qui do 				"S:\Head_or_Heart\max\post-trial-extension\2-do\00-global.do"
 timer      	 		clear
 timer       			on 1
 use 				"${datadir}\populationforfft_deidentified 2.dta", clear
@@ -31,7 +31,7 @@ replace				`var' =. if `var'==0
 egen				fup_tot =rownonmiss(fup*)
 * merge in birthcharacteristics: 
 ****************************************************************************************************************************************************************
-merge 1:1 			studyid1 using "S:\Head_or_Heart\max\attributes\1-Data\all\attributedataset_randomised.dta", keepusing(d_rand* sex died bwt gestage trial centre smokdur matage matedu byr *iq* iq_score)
+merge 1:1 			studyid1 using "${datadir}\attributedataset_randomised.dta", keepusing(d_rand* sex died bwt gestage trial centre smokdur matage matedu byr *iq* iq_score)
 drop				_merge
 replace				group=4 if group==. & (trial==3 | trial==4)
 keep				studyid1 group iq* sex exp* died bwt gestage trial centre smokdur matage matedu byr
@@ -45,7 +45,7 @@ drop				trial
 rename				trialdis trial
 * merge in information on who was linked:
 ****************************************************************************************************************************************************************
-merge 1:1 		studyid1 using "S:\Head_or_Heart\max\post-trial-extension\1-data\finalsampleandmainoutcomes.dta"
+merge 1:1 			studyid1 using "${datadir}\1-data\finalsampleandmainoutcomes.dta"
 * flag those that linked:
 ****************************************************************************************************************************************************************
 generate			nolink=0
