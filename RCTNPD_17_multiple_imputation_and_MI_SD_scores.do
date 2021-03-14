@@ -18,7 +18,7 @@ log 				using  "${logdir}\mi_edu_outcomes2$S_DATE.log", replace
 *				17/12/2020 - some deaths were wrong (copied over from twins) this is corrected now
 *				19/12/2020 - exclude cows milk group from Iron standardisation
 *				28/01/2020 - annotate who I excluded / included and why
-*				05/03/2021 - make more readable
+*				14/03/2021 - add directories
 *author: 			maximiliane verfuerden
 *============================================================================================================================================================
 timer      	 		clear
