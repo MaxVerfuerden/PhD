@@ -3,7 +3,7 @@ log 				using  "S:\Head_or_Heart\max\post-trial-extension\4-logs\mi_edu_outcomes
 *============================================================================================================================================================
 *For:				PhD Thesis - Chapter 7 and 8
 *Purpose: 			- Creates analysis dataset (samplingframe)		
-*				- Performs multiple imputation (starts from line: 93)
+*				- Performs multiple imputation (starts from line: 85)
 *date created: 	02/07/2019
 *last updated: 	04/05/2020 	- add allocation variable
 *				05/05/2020 - use "mi passive:" to generate z-scores
@@ -119,8 +119,8 @@ mi 				describe
 tab 				trial group
 replace				iq_score=. if !inlist(trial,3,4,5,6)
 replace 			later_iq_score=. if !inlist(trial,5,6)
-replace				bayley_PDI=. if !inlist(trial, 3,4,5,6,8)
-replace				bayley_MDI=. if !inlist(trial, 3,4,5,6,8)
+replace				bayley_PDI=. if !inlist(trial,3,4,5,6,8)
+replace				bayley_MDI=. if !inlist(trial,3,4,5,6,8)
 * drop those who died
 drop				if died==1
 * drop breastfeds and cow's milk ones to not skew z-scores
@@ -143,11 +143,11 @@ mi passive: 		egen	meanmaths16raw = rowmean(*gcse2210_score)
 tabstat				meanmaths16raw, by(trial) s(mean sd min max)
 levelsof			trial, local(levels) 
 foreach				l of local levels {
-mi passive: 		egen		z_gcsemat_t`l' = std(meanmaths16raw)  if trial == `l' 
+mi passive: 		egen	z_gcsemat_t`l' = std(meanmaths16raw)  if trial == `l' 
 tabstat				z_gcsemat_t`l' if trial == `l', s(mean sd) by(group) format(%5.2f)
 }
 * z-score GCSE Maths compared to the national sample
-mi passive:	 		gen	z_gcsemat_nat = (gcse2210_score - 4.913)/ 1.8138
+mi passive:	 		gen z_gcsemat_nat = (gcse2210_score - 4.913)/ 1.8138
 tabstat				z_gcsemat_nat, by(trial) s(mean sd min max) format(%5.4f)
 * z-score GCSE English lang:	
 mi passive: 		egen	meanenglish16raw = rowmean(*gcse5030_score) 
