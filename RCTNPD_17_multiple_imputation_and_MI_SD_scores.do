@@ -8,7 +8,7 @@ log 				using  "${logdir}\mi_edu_outcomes2$S_DATE.log", replace
 *Purpose: 			- Creates analysis dataset (samplingframe)		
 *				- Performs multiple imputation (starts from line: 85)
 *date created: 	02/07/2019
-*last updated: 	04/05/2020 	- add allocation variable
+*last updated: 			04/05/2020 - add allocation variable
 *				05/05/2020 - use "mi passive:" to generate z-scores
 *				21/05/2020 - replaced birthyear with birthmonth because byr collinear with trial also made bayley scores conditional on trials that measured bayley score
 *				21/07/2020 - I realised I forgot to include gestational age and those who died in imputation model.
