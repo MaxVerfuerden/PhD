@@ -1,12 +1,11 @@
-capture 		log close
-log 			using  "S:\Head_or_Heart\max\post-trial-extension\4-logs\mi_edu_outcomes2$S_DATE.log", replace
-*==============================================================================
-*For:			PhD Thesis - Chapter 8
-*Purpose: 		- Creates analysis dataset (samplingframe)		
-*				- corrects some mistakes 
-*				- Performs multiple imputation for school outcomes 
+capture 			log close
+log 				using  "S:\Head_or_Heart\max\post-trial-extension\4-logs\mi_edu_outcomes2$S_DATE.log", replace
+*============================================================================================================================================================
+*For:				PhD Thesis - Chapter 7 and 8
+*Purpose: 			- Creates analysis dataset (samplingframe)		
+*				- Performs multiple imputation (starts from line: 93)
 *date created: 	02/07/2019
-*last updated: 	04/05/2020 - add allocation variable
+*last updated: 	04/05/2020 	- add allocation variable
 *				05/05/2020 - use "mi passive:" to generate z-scores
 *				21/05/2020 - replaced birthyear with birthmonth because byr collinear with trial also made bayley scores conditional on trials that measured bayley score
 *				21/07/2020 - I realised I forgot to include gestational age and those who died in imputation model.
@@ -17,27 +16,27 @@ log 			using  "S:\Head_or_Heart\max\post-trial-extension\4-logs\mi_edu_outcomes2
 *				19/12/2020 - exclude cows milk group from Iron standardisation
 *				28/01/2020 - annotate who I excluded / included and why
 *				05/03/2021 - make more readable
-*author: 		maximiliane verfuerden
-*==============================================================================
+*author: 			maximiliane verfuerden
+*============================================================================================================================================================
 clear
-cd 				"S:\Head_or_Heart\max\post-trial-extension"
+cd 			"S:\Head_or_Heart\max\post-trial-extension"
 qui do 			"S:\Head_or_Heart\max\post-trial-extension\2-do\00-global.do"
 timer      	 	clear
-timer       	on 1
+timer       		on 1
 use 			"S:\Head_or_Heart\max\archive\1-data\populationforfft_deidentified 2.dta", clear
 drop			fup_* fupb*
 foreach 		var of varlist fup*{
 replace			`var' =. if `var'==0
 }
 egen			fup_tot =rownonmiss(fup*)
-* merge in birthcharacteristics 
-********************************************************************************
+* merge in birthcharacteristics: 
+****************************************************************************************************************************************************************
 merge 1:1 		studyid1 using "S:\Head_or_Heart\max\attributes\1-Data\all\attributedataset_randomised.dta", keepusing(d_rand* sex died bwt gestage trial centre smokdur matage matedu byr *iq* iq_score)
 drop			_merge
 replace			group=4 if group==. & (trial==3 | trial==4)
 keep			studyid1 group iq* sex exp* died bwt gestage trial centre smokdur matage matedu byr
-* change order of trials so it matches with order in thesis 
-********************************************************************************	
+* change order of trials so it matches with order in thesis: 
+****************************************************************************************************************************************************************	
 recode 			trial (8=4) (7=8) (6=7) (5=6) (4=5), gen(trialdis) 
 lab def			trialdis 1"OA" 2"OB" 3"PDP" 4"SGA" 5"DHA preterm" 6"DHA Term" 7"Nucleotides" 8"Iron" 9"Palmitate"
 lab var			trialdis trialname
@@ -45,12 +44,10 @@ lab val			trialdis trialdis
 drop			trial
 rename			trialdis trial
 * merge in information on who was linked:
-********************************************************************************
+****************************************************************************************************************************************************************
 merge 1:1 		studyid1 using "S:\Head_or_Heart\max\post-trial-extension\1-data\finalsampleandmainoutcomes.dta"
-replace			died=0 if died==1 & matchprobability>94 & matchprobability!=.
-replace			died=0 if studyid1=="T070"
 * flag those that linked:
-********************************************************************************
+****************************************************************************************************************************************************************
 generate		nolink=0
 replace			nolink=1 if _merge==1
 generate		linked=1 if _merge==3
@@ -63,9 +60,9 @@ replace			`var' =. if `var'==0
 }
 egen			fup_tot2 =rownonmiss(fup__*)
 replace			fup_tot = fup_tot2 if fup_tot==.
-* save this dataset for the trajectory analysis
-********************************************************************************
-keep			studyid1 W *score* matchprob* *match* *first* *dob* *id* exp* pupilref linked group* sex bwt iq bayley bwt trial fup_tot centre smokdur matage matedu W gestage multiple agreementpattern iq_score gcse*score ks2_* passac5 year_* bayley_MDI bayley_PDI sen_ever apgar5m byr bmth check died age_* d_randomisation  later_iq_score byr
+* save this dataset for the trajectory analysis:
+****************************************************************************************************************************************************************
+keep			studyid1 W *score* matchprob* *match* *first* *id* exp* pupilref linked group* sex bwt iq bayley bwt trial fup_tot centre smokdur matage matedu W gestage multiple agreementpattern iq_score gcse*score ks2_* passac5 year_* bayley_MDI bayley_PDI sen_ever apgar5m byr bmth check died age_* d_randomisation  later_iq_score byr
 compress
 descr, 			full	
 save			"S:\Head_or_Heart\max\post-trial-extension\1-data\trajectory.dta", replace
@@ -84,7 +81,7 @@ generate		teen = 0
 replace teen    =1 if matage <20
 replace teen    =. if matage ==.
 * save this dataset which is the analysis sample
-********************************************************************************
+****************************************************************************************************************************************************************
 compress
 descr, 			full
 save			"S:\Head_or_Heart\max\post-trial-extension\1-data\samplingframe.dta", replace
@@ -92,26 +89,26 @@ save			"S:\Head_or_Heart\max\post-trial-extension\1-data\samplingframe.dta", rep
 * keep those who did not link/ were implausible as they have no school outcomes (either never or purpusefully excluded from school link dofile) and their outcomes will be imputed and used in main analysis
 drop			if trial==1 | trial==2
 replace			died =0 if died !=1
-********************************************************************************
+****************************************************************************************************************************************************************
 * MULTIPLE IMPUTATION
-********************************************************************************
+****************************************************************************************************************************************************************
 /* which variables are missing? */
-mdesc			_all
+mdesc				_all
 /* of the ones I want to impute whats the % missing? */	
-mdesc 			matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple 
-bysort 			trial: mdesc 			matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple 
+mdesc 				matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple 
+bysort 				trial: mdesc matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple 
 /* store imputed data in marginal long format*/ 											
-mi set 			mlong 															
+mi set 				mlong 															
 /* describe patterns of missingness and check how auxiliary variables perform (correlations)  */
-mi misstable	summarize matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple		
-mi misstable	patterns matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple		
-pwcorr			matedu matage smokdur bwt gcse2210_score gcse5030_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple bmth sex group trial centre 				
+mi misstable			summarize matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple		
+mi misstable			patterns matedu matage smokdur ks2*raw passac5 bwt gcse5030_score gcse2210_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple		
+pwcorr				matedu matage smokdur bwt gcse2210_score gcse5030_score iq_score bayley_MDI bayley_PDI gestage sen_ever multiple bmth sex group trial centre 				
 /* register variables that need imputation */	
 mi 				register imputed matedu matage smokdur ks2*raw passac5 bwt gcse5* gcse2* iq_score bayley_MDI bayley_PDI gestage sen_ever multiple
 /* register variables that are complete */	
 mi 				register regular bmth sex group trial centre fup_tot 
 * imputation
-mi impute 		chained (logit) multiple smokdur passac5 sen_ever (ologit) matedu (pmm, knn(8)) bwt gestage matage ks2_mat_raw ks2_engread_raw ks2_engtot_raw gcse2210_score gcse5030_score  ///
+mi impute 			chained (logit) multiple smokdur passac5 sen_ever (ologit) matedu (pmm, knn(8)) bwt gestage matage ks2_mat_raw ks2_engread_raw ks2_engtot_raw gcse2210_score gcse5030_score  ///
 				(regress, cond(trial==3 | trial==4 | trial==5 | trial==6)) iq_score ///
 				(regress, cond(trial==3 | trial==4 | trial==5 | trial==6 | trial==8)) bayley_MDI bayley_PDI  ///
 				= i.trial i.centre i.bmth i.sex i.group i.fup_tot, ///
@@ -119,15 +116,15 @@ mi impute 		chained (logit) multiple smokdur passac5 sen_ever (ologit) matedu (p
 /* 				cond= conditional: only impute iq in those trials that measured it 
 				(need to be non missing in all other trials for this to work so replaced it with -99) 
 				pmm= predictive mean matching using 8 nearest neighbours (knn(8))*/				
-********************************************************************************				
+****************************************************************************************************************************************************************			
 * drop observations that were only needed for the imputation: 
-********************************************************************************	
+****************************************************************************************************************************************************************	
 save	"S:\Head_or_Heart\max\post-trial-extension\1-data\mi_fresh.dta", replace
-mi 					describe
-use		"S:\Head_or_Heart\max\post-trial-extension\1-data\mi_fresh.dta", clear
-mi 					describe
+mi 				describe
+use				"S:\Head_or_Heart\max\post-trial-extension\1-data\mi_fresh.dta", clear
+mi 				describe
 mi convert			wide
-mi 					describe
+mi 				describe
 tab 				trial group
 replace				iq_score=. if !inlist(trial,3,4,5,6)
 replace 			later_iq_score=. if !inlist(trial,5,6)
