@@ -1,15 +1,14 @@
 /*******************************************************************************
-Project: 	head or heart
-Purpose: 	creates database of expected id numbers at each fup
-Author: 	Max Verfuerden
-Created:	24.04.2017
-Updates: 	01.10.2019 - added group allocation
+Project:   head or heart
+Purpose:   creates database of expected id numbers at each fup
+Author:   Max Verfuerden
+Created:  24.04.2017
+Updates:  01.10.2019 - added group allocation
 *******************************************************************************/
 *basics
-qui do 		"S:\Head_or_Heart\max\attributes\2-Cleaning\00-global.do"
-cd 			"$projectdir"
-cap log 	close
-log using 	"${logdir}\expected IDs $S_DATE.log", replace 
+cd        "$projectdir"
+cap log   close
+log using "${logdir}\expected IDs $S_DATE.log", replace 
 ********************************************************************************
 * start with master database and keep only ID sex fup variables
 ********************************************************************************
@@ -24,42 +23,42 @@ save		"${datadir}\all\expected IDs.dta", replace
 * add other databases and keep only ID d_dob sex fup variables
 ********************************************************************************
 * iron
-append		using "${datadir}\iron\iron_clean.dta", keep(*id* sex* d_* fup*)
+append    using "${datadir}\iron\iron_clean.dta", keep(*id* sex* d_* fup*)
 count	
 * lcpufa preterm
-append		using "${datadir}\lcpufa_preterm\LCPUFA_preterm clinical to 18m_clean.dta", keep(*id* sex* d_* fup*)
+append    using "${datadir}\lcpufa_preterm\LCPUFA_preterm clinical to 18m_clean.dta", keep(*id* sex* d_* fup*)
 count		
 * lcpufa term
-append		using "${datadir}\lcpufa_term\LCPUFA_term clinical vision 6y_clean.dta", keep(*id* sex* d_* fup*)
+append    using "${datadir}\lcpufa_term\LCPUFA_term clinical vision 6y_clean.dta", keep(*id* sex* d_* fup*)
 count		
 * nucleotides
-append		using "${datadir}\nucleotides\nucleotides clinical_clean.dta", keep(*id* sex* d_* fup*)
+append    using "${datadir}\nucleotides\nucleotides clinical_clean.dta", keep(*id* sex* d_* fup*)
 count		
 * palmitate
-append		using "${datadir}\palmitate aka betapol\palmitate clinical_clean.dta", keep(*id* *ID* sex* d_* fup*)
+append    using "${datadir}\palmitate aka betapol\palmitate clinical_clean.dta", keep(*id* *ID* sex* d_* fup*)
 count		
 * post discharge preterm
-append		using "${datadir}\preterm postdischarge\preterm postdischarge_clean.dta", keep(*id* sex* d_* fup*)
+append    using "${datadir}\preterm postdischarge\preterm postdischarge_clean.dta", keep(*id* sex* d_* fup*)
 count		
 * sga term
-append		using "${datadir}\sga_term\sga_term all clinical clean.dta", keep(*id* *ID* sex* d_* fup*)
+append    using "${datadir}\sga_term\sga_term all clinical clean.dta", keep(*id* *ID* sex* d_* fup*)
 count		
-save		"${datadir}\all\expected IDs.dta", replace
+save      "${datadir}\all\expected IDs.dta", replace
 count		
 ********************************************************************************
 * harmonise variables
 ********************************************************************************
-order		_all, alphab
+order     _all, alphab
 * which trial does the participant belong to?
 replace 	trial =1 	if sex_orig !=. // OAB
 // no trial 2 because O A&B are together in one database
-replace 	trial =3 	if sex_ppd !=.  // PDP
-replace 	trial =4 	if sex_lcpre !=. | fup17y_lcpre !=. // LCPUFA preterm
-replace 	trial =5 	if sex_lcterm !=. // LCPUFA term
-replace 	trial =6 	if sex_nuc !="" // Nuc
-replace 	trial =7 	if sex_iron !="" // Iron
-replace 	trial =8 	if sex_sgaterm !=. // SGA term
-replace 	trial =9 	if sex_palm !=.  // Palmitate term
+replace   trial =3 	if sex_ppd !=.  // PDP
+replace   trial =4 	if sex_lcpre !=. | fup17y_lcpre !=. // LCPUFA preterm
+replace   trial =5 	if sex_lcterm !=. // LCPUFA term
+replace   trial =6 	if sex_nuc !="" // Nuc
+replace   trial =7 	if sex_iron !="" // Iron
+replace   trial =8 	if sex_sgaterm !=. // SGA term
+replace   trial =9 	if sex_palm !=.  // Palmitate term
 lab def	trial1 1"OAB" 2"-" 3"PDP" 4"LCPUFA pret" 5"LCPUFA term" 6"NUC" 7"Iron" 8"SGA" 9"PAL" 
 lab	val	trial trial1
 tab trial, m
@@ -67,22 +66,22 @@ tab trial, m
 replace		sex_iron ="1" if sex_iron =="M"
 replace		sex_iron ="2" if sex_iron =="F"
 destring 	sex_iron sex_nuc, replace
-gen			sex =.
+gen			  sex =.
 foreach var of varlist sex_iron sex_lcglas sex_lcpre sex_lcterm sex_nuc sex_orig sex_palm sex_ppd sex_sgaglas sex_sgaterm {
 replace		sex = 1 if `var' ==1
 replace		sex = 2 if `var' ==2
 }
-drop 		sex_* sex2* sexr*
+drop 		  sex_* sex2* sexr*
 tabstat		sex, by(trial) s(mean min max)
-* fup, check that I do not include 2 variables from same trial in same category which would loose information
-gen			fup6w =.
-foreach var of varlist fup6w_iron fup6w_lcglas fup6w_lcterm fup6w_palm fup6w_ppd fup6w_sgaterm {
-replace		fup6w = `var' if `var' !=. & fup6w==.
+* fup,  check that I do not include 2 variables from same trial in same category which would loose information
+gen			  fup6w =.
+foreach   var of varlist fup6w_iron fup6w_lcglas fup6w_lcterm fup6w_palm fup6w_ppd fup6w_sgaterm {
+replace   fup6w = `var' if `var' !=. & fup6w==.
 }
-drop		fup6w_*
-gen			fup8w =.
-foreach var of varlist fup8w_nuc fup8w_sgaglas {
-replace		fup8w = `var' if `var' !=. & fup8w==.
+drop		  fup6w_*
+gen			  fup8w =.
+foreach   var of varlist fup8w_nuc fup8w_sgaglas {
+replace   fup8w = `var' if `var' !=. & fup8w==.
 }
 drop		fup8w_*
 gen			fup26w =.
