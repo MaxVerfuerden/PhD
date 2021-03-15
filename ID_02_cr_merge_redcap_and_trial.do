@@ -10,8 +10,7 @@ Created:	25.04.2017
 // run the dropmiss-ado-file (is pinned on left hand side in project view)
 *step 2: set filepaths, start log
 ********************************************************************************
-qui do 		"S:\Head_or_Heart\max\archive\2-do\00-global.do"
-cd 			"$projectdir"
+cd 		"$projectdir"
 cap log 	close
 log using 	"${logdir}\cr_merge_redcap_and_trial_$S_DATE.log", replace 
 *step 3: deduplicate redcap data
@@ -33,7 +32,7 @@ restore
 ********************************************************************************
 *step 4:  with clinical data (more than in redcap) /// start here if I have run this do-file on same file before
 ********************************************************************************
-use			"S:\Head_or_Heart\max\attributes\1-Data\all\expected IDs.dta" , clear  
+use		"${datadir}\1-Data\all\expected IDs.dta" , clear  
 order		_all, alphab
 order		studyid1 trial d_dob sex 
 rename		sex sex_clin
