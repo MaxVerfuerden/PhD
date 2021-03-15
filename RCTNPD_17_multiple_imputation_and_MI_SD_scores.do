@@ -1,12 +1,11 @@
 clear
 capture 			log close
-cd 				"S:\Head_or_Heart\max\post-trial-extension"
-qui do 				"S:\Head_or_Heart\max\post-trial-extension\2-do\00-global.do"
+cd 				"$projectdir"
 log 				using  "${logdir}\mi_edu_outcomes2$S_DATE.log", replace
 *============================================================================================================================================================
 *For:				PhD Thesis - Chapter 7 and 8
 *Purpose: 			- Creates analysis dataset (samplingframe)		
-*				- Performs multiple imputation (starts from line: 85)
+*				- Performs multiple imputation (starts from line: 854
 *date created: 	02/07/2019
 *last updated: 			04/05/2020 - add allocation variable
 *				05/05/2020 - use "mi passive:" to generate z-scores
@@ -45,7 +44,7 @@ drop				trial
 rename				trialdis trial
 * merge in information on who was linked:
 ****************************************************************************************************************************************************************
-merge 1:1 			studyid1 using "${datadir}\1-data\finalsampleandmainoutcomes.dta"
+merge 1:1 			studyid1 using "${datadir}\finalsampleandmainoutcomes.dta"
 * flag those that linked:
 ****************************************************************************************************************************************************************
 generate			nolink=0
