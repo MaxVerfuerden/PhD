@@ -6,11 +6,10 @@ Created:	08.08.2017
 *******************************************************************************/
 * basics - set up filepaths, start log and load dataset
 ********************************************************************************
-qui do 		"S:\Head_or_Heart\max\archive\2-do\00-global.do"
-cd 			"$projectdir"
+cd 		"$projectdir"
 cap log 	close
 log using 	"${logdir}\clean_and_validate_redcaptrial_$S_DATE.log", replace 
-use			"${datadir}\ID_merged_database.dta", clear
+use		"${datadir}\ID_merged_database.dta", clear
 * lowercase:
 ********************************************************************************
 foreach 	var of varlist city* county* *name* street* *firstna* *lastna* patnot* {
@@ -197,4 +196,4 @@ compress
 save		"${datadir}\clean ID database $S_DATE.dta", replace
 ** which group are they in?
 ********************************************************************************
-merge 1:1 	studyid1 using "S:\Head_or_Heart\max\attributes\1-Data\all\cog_missingess_dataset.dta", keepusing(multiple)
+merge 1:1 	studyid1 using "${datadir}\1-Data\all\cog_missingess_dataset.dta", keepusing(multiple)
