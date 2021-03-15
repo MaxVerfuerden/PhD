@@ -8,9 +8,9 @@ author: 		    maximiliane verfuerden
 ===============================================================================*/
 clear
 cd          "$projectdir"
-capture 	  log close
-log 		    using "${logdir}\04-ev_linkage_trial_5 $S_DATE.log", replace 
-use 		    "${datadir}\linktable.dta", clear 
+capture     log close
+log         using "${logdir}\04-ev_linkage_trial_5 $S_DATE.log", replace 
+use         "${datadir}\linktable.dta", clear 
 duplicates 	tag studyid, gen(dup_studyid)
 ********************************************************************************
 *           merge in trial                    						   
