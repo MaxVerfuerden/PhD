@@ -6,7 +6,7 @@ author: maximiliane verfuerden
 clear
 cd 			    "$projectdir"
 capture 	  log close
-log 		   using "${logdir}\01-cl_loaddata $S_DATE.log", replace 
+log 		    using "${logdir}\01-cl_loaddata $S_DATE.log", replace 
 *** "all data" ***
 import      delimited "${datadir}\1-data\GtOrmondStOutputs2\GtOrmondStAllData.csv, clear
 by          pupilreference, sort: gen unique = _n==1
