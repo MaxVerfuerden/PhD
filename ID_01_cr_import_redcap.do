@@ -6,10 +6,8 @@ Created:	08.03.2017
 *******************************************************************************/
 *step 1: set filepaths, start log
 ********************************************************************************
-qui do 		"S:\Head_or_Heart\max\attributes\2-Cleaning\00-global.do"
-cd 			"S:\Head_or_Heart\max\archive"
-cap log 	close
-log using 	"${logdir}\cr_import_redcap_$S_DATE.log", replace 
+cap log 			close
+log using 			"${logdir}\cr_import_redcap_$S_DATE.log", replace 
 local				c_date = c(current_date)
 display				"`c_date'"
 local				time_string = subinstr("`c_date'",":","_",.)
@@ -87,12 +85,12 @@ lab val	fup___22 fup22
 replace fup___15=1 if fup___18==1
 drop	fup___18**************************************************************************** 
 ******************************************************************************** 
-save "S:\Head_or_Heart\max\archive\1-data\ID_database`time_string'", replace 
+save "${datadir}\ID_database`time_string'", replace 
 ******************************************************************************** 
 ******************************************************************************** 
 * export trial fup tabulation:
 * set up spreadsheet
-putexcel set "S:\Head_or_Heart\max\identifiers\5-reports\progress $S_DATE", replace
+putexcel set "${tabledir}\identifiers\5-reports\progress $S_DATE", replace
 putexcel A1=("Progress report $S_DATE") 
 putexcel A2=("trial") B2=("recruitment") C2=("randomisation") D2=("3 weeks") ///
 E2=("6 weeks") F2=("8 weeks") G2=("12 weeks") H2=("16 weeks") I2=("18w") ///
