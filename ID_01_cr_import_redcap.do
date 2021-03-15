@@ -1,8 +1,8 @@
 /*******************************************************************************
-Project: 	head or heart
-Purpose: 	tracks progress of archiving
-Author: 	Max Verfuerden
-Created:	08.03.2017
+Project: 			head or heart
+Purpose: 			tracks progress of archiving
+Author: 			Max Verfuerden
+Created:			08.03.2017
 *******************************************************************************/
 *step 1: set filepaths, start log
 ********************************************************************************
